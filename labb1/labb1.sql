@@ -83,7 +83,7 @@ GO
 --- select data from users into NewUsers
 SELECT
     * ,
-    FirstName + ' '+LastName As Name ,
+    FirstName + ' '+LastName As [Name] ,
     CASE
       when CAST(left(right(ID,2),1) AS int) %2 = 0
       THEN 'Female'
@@ -239,6 +239,101 @@ GO
 
 ---- Company (Joins)
 
+/*check tabels first to see how data stores in every table and
+how the connect to each other*/
+
+Select *
+from company.products;
+GO
+
+SELECT *
+from company.suppliers;
+GO
+
+Select *
+from company.categories;
+GO
+
+---- First join query
+
+select
+    company.products.Id,
+    company.products.ProductName,
+    company.suppliers.CompanyName,
+    company.categories.CategoryName
+from
+    company.products
+    join company.suppliers
+    on company.products.SupplierId = company.suppliers.Id
+    join company.categories
+    on company.products.CategoryId = company.categories.Id;     
+GO
+
+-----Second join query
+
+--- total employees are 9
+select *
+from company.employees;
+GO
+--- total region are 4
+Select *
+from company.regions;
+GO
+--- 
+Select *
+from company.employee_territory;
+GO
+
+Select *
+from company.territories;
+GO
+
+---- number of employees in every region
+
+Select
+
+    company.regions.Id,
+    company.regions.RegionDescription,
+    count( DISTINCT company.employee_territory.EmployeeId) As NumberOfEmployees
+
+from company.regions
+    join company.territories
+    on company.regions.Id= company.territories.RegionId
+    join company.employee_territory
+    on company.territories.Id = company.employee_territory.TerritoryId
+    join company.employees
+    on company.employee_territory.EmployeeId = company.employees.Id
+group by
+    company.regions.Id,
+    company.regions.RegionDescription;
+GO
+
+--- VG Self-join
+
+Select *
+from company.employees;
+GO
+
+/* 
+The table contains both Id and ReportsTo columns.
+ReportsTo references another employee Id in the same table.
+
+Some employees are managers for other employees.
+Since there are 9 employees, I noticed that employees with Id 2 and 5 appear to be managers.
+*/
+
+select
+    e.Id as Id,
+    e.TitleOfCourtesy + ' ' + e.FirstName + ' ' + e.LastName AS Name,
+    ISNULL(
+        m.TitleOfCourtesy + ' ' + m.FirstName + ' ' + m.LastName,
+        'Nobody!'
+    ) AS [Reports to]
+from company.employees e
+    left join company.employees m
+    on e.ReportsTo = m.Id;     
+
+   
 
 
 
