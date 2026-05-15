@@ -126,3 +126,4 @@ declare @playlist varchar(max) = 'Heavy Metal Classic';
 Select *
 from music.media_types;
 
+
