@@ -121,9 +121,168 @@ GO
 
 
 ----------- schema “music”
+
+SELECT *
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = 'music';
+
+select *
+from music.playlists;
+GO
+select *
+from music.genres ;
+GO
+select *
+from music.albums ;
+GO
+select *
+from music.artists ;
+GO
+select *
+from music.tracks ;
+GO
+SELECT *
+from music.media_types
+;
+----
+
 declare @playlist varchar(max) = 'Heavy Metal Classic';
 
-Select *
-from music.media_types;
+select
+    --newid() as 'GUID',
+    --p.Name as 'Playlist',
+    g.Name as 'Genre',
+    ar.Name as 'Artist',
+    al.Title as 'Album',
+    t.Name as 'Track',
+    FORMAT(DATEADD(ms, t.Milliseconds, '00:00'), 'mm:ss') AS 'Length',
+    --concat(t.Milliseconds / 1000 / 60 % 60, ':', t.Milliseconds / 1000 % 60) as 'Length2'
+    CONCAT(format(t.Bytes / power(1024.0, 2), '#.0'), ' MiB') as 'Size',
+    isnull(Composer, '-') as 'Composer'
+from
+    music.tracks t
+    join music.genres g on g.GenreId = t.GenreId
+    join music.albums al on al.AlbumId = t.AlbumId
+    join music.artists ar on ar.ArtistId = al.ArtistId
+    join music.playlist_track pt on pt.TrackId = t.TrackId
+    join music.playlists p on p.PlaylistId = pt.PlaylistId
+where 
+	p.Name = @playlist
+order by
+	newid()
+--Artist, Album, Track
+
+--------
+/*
+1. Av alla audiospår, vilken artist har längst total speltid?
+*/
+
+select top 1
+
+    ar.Name    as artistName,
+    SUM(t.Milliseconds) / 1000 / 60.0 / 60 as total_Hours
+
+from music.tracks t
+    join music.albums al
+    on t.AlbumId = al.AlbumId
+    join music.artists ar
+    on ar.ArtistId = al.ArtistId
+GROUP BY
+         ar.Name
+ORDER BY
+          sum(t.Milliseconds) DESC
+
+/*
+2. Vad är den genomsnittliga speltiden på den artistens låtar?
+*/
+
+select top 1
+
+    ar.Name    as artistName,
+    SUM(t.Milliseconds) / 1000 / 60.0  as total_minutes,
+    AVG(t.Milliseconds) / 1000 / 60.0  as Average_minutes
+
+from music.tracks t
+    join music.albums al
+    on t.AlbumId = al.AlbumId
+    join music.artists ar
+    on ar.ArtistId = al.ArtistId
+GROUP BY
+         ar.Name
+ORDER BY
+          sum(t.Milliseconds) DESC
+
+---på annat sätt
+
+select
+
+    ar.Name ,
+    AVG(t.Milliseconds) / 1000 / 60.0  as Average_minutes
+
+from music.tracks t
+    join music.albums al
+    on t.AlbumId = al.AlbumId
+    join music.artists ar
+    on ar.ArtistId = al.ArtistId
+
+where ar.ArtistId = (
+        select top 1
+    ar.ArtistId
+from music.tracks t
+    join music.albums al
+    on t.AlbumId = al.AlbumId
+    join music.artists ar
+    on ar.ArtistId = al.ArtistId
+GROUP BY
+         ar.ArtistId
+ORDER BY
+          sum(t.Milliseconds) DESC
+    )
+GROUP BY ar.Name
+;
+
+/*
+   3. Vad är den sammanlagda filstorleken för all video?
+   */
+
+select
+
+    sum(CAST(m.Bytes as bigint)) as total_video
+
+from music.tracks  m
+    join music.media_types md
+    on m.MediaTypeId = md.MediaTypeId
+where 
+         -- md.Name LIKE '%video%'
+         md.MediaTypeId = 3
+
+/*
+4. Vilket är det högsta antal artister som finns på en enskild spellista?
+*/
+
+SELECT TOP 1
+    p.Name AS PlaylistName,
+    COUNT(DISTINCT ar.ArtistId) AS TotalArtists
+
+FROM music.playlists p
+
+    JOIN music.playlist_track pt
+    ON p.PlaylistId = pt.PlaylistId
+
+    JOIN music.tracks t
+    ON t.TrackId = pt.TrackId
+
+    JOIN music.albums al
+    ON al.AlbumId = t.AlbumId
+
+    JOIN music.artists ar
+    ON ar.ArtistId = al.ArtistId
+
+GROUP BY p.Name
+
+ORDER BY TotalArtists DESC;     
 
 
+/*
+5. Vilket är det genomsnittliga antalet artister per spellista?
+*/
