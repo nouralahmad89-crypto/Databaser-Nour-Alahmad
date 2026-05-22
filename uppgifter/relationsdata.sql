@@ -280,9 +280,37 @@ FROM music.playlists p
 
 GROUP BY p.Name
 
-ORDER BY TotalArtists DESC;     
+ORDER BY TotalArtists DESC;
 
 
 /*
 5. Vilket är det genomsnittliga antalet artister per spellista?
 */
+
+SELECT
+    AVG(TotalArtists * 1.0) AS AverageArtistsPerPlaylist
+FROM
+    (
+    SELECT
+        p.PlaylistId,
+        COUNT(DISTINCT ar.ArtistId) AS TotalArtists
+
+    FROM music.playlists p
+
+        JOIN music.playlist_track pt
+        ON p.PlaylistId = pt.PlaylistId
+
+        JOIN music.tracks t
+        ON t.TrackId = pt.TrackId
+
+        JOIN music.albums al
+        ON al.AlbumId = t.AlbumId
+
+        JOIN music.artists ar
+        ON ar.ArtistId = al.ArtistId
+
+    GROUP BY p.PlaylistId
+) AS PlaylistStats;    
+
+
+
