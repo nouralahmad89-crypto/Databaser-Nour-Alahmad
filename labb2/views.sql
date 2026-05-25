@@ -67,7 +67,7 @@ GO
 CREATE VIEW LagerPerKategori
 AS
 
-    SELECT
+    Select
 
         k.KategoriNamn AS Kategori,
 
@@ -96,3 +96,53 @@ from LagerPerKategori;
  
 GO
 
+----------- en till vy 
+/*
+Denna vy hjälper bokhandeln att analysera
+kunders köpvanor och identifiera ,återkommande kunder.
+Informationen kan användas för:
+kundanalyser, marknadsföring, och lojalitetsprogram.
+*/
+
+select *
+from Kunder;
+GO
+select *
+from Ordrar;
+GO
+select *
+from OrderDetaljer;
+GO
+
+CREATE VIEW KundBeställningar
+AS
+
+    SELECT
+
+        k.FörNamn + ' ' + k.EfterNamn AS KundNamn,
+
+        COUNT(DISTINCT o.OrderID) AS AntalOrdrar,
+
+        SUM(od.Antal) AS TotaltKöptaBöcker,
+
+        SUM(od.Antal * od.Pris) AS TotaltSpenderat
+
+    FROM Kunder k
+
+        JOIN Ordrar o
+        ON k.KundID = o.KundID
+
+        JOIN OrderDetaljer od
+        ON o.OrderID = od.OrderID
+
+    GROUP BY
+
+    k.KundID,
+    k.FörNamn,
+    k.EfterNamn;
+
+GO
+
+SELECT *
+from KundBeställningar
+ORDER BY TotaltSpenderat DESC;
