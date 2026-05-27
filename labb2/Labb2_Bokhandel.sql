@@ -45,7 +45,7 @@ CREATE TABLE Förlag
 );
 
 --3)
-CREATE TABLE Böcker
+create table Böcker
 (
 
     ISBN13 CHAR(13) NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE Böcker
 ;
 
 --4)
-CREATE TABLE BokFörfattare
+create table BokFörfattare
 (
 
     FörfattareID INT,
@@ -92,7 +92,7 @@ CREATE TABLE BokFörfattare
 );
 
 --5)
-CREATE TABLE Kategorier
+create table Kategorier
 (
 
     KategoriID INT IDENTITY(1,1),
@@ -105,7 +105,7 @@ CREATE TABLE Kategorier
 );
 
 --6)
-CREATE TABLE BokKategori
+create table BokKategori
 (
 
     ISBN13 CHAR(13),
@@ -125,7 +125,7 @@ CREATE TABLE BokKategori
 
 );
 --7)
-CREATE TABLE Butiker
+create table Butiker
 (
 
     ButikID INT IDENTITY(1,1),
@@ -143,7 +143,7 @@ CREATE TABLE Butiker
 );
 
 --8)
-CREATE TABLE LagerSaldo
+Create table LagerSaldo
 (
 
     ButikID INT,
@@ -169,7 +169,7 @@ CREATE TABLE LagerSaldo
 );
 
 --9)
-CREATE TABLE Kunder
+create table Kunder
 (
 
     KundID INT IDENTITY(1,1),
@@ -188,7 +188,7 @@ CREATE TABLE Kunder
 );
 
 --10)
-CREATE TABLE Ordrar
+create table Ordrar
 (
 
     OrderID INT IDENTITY(1,1),
@@ -219,7 +219,7 @@ CHECK (OrderDatum <= GETDATE());
 
 --11)
 
-CREATE TABLE OrderDetaljer
+create table OrderDetaljer
 (
 
     OrderID INT,
@@ -258,10 +258,15 @@ insert into  Förlag
     (FörlagsNamn, Land)
 values
     ('Addison-Wesley', 'USA'),
+
     ('O''Reilly Media', 'USA'),
+
     ('Penguin Books', 'Storbritannien'),
+
     ('Bloomsbury', 'Storbritannien'),
+
     ('Norstedts', 'Sverige'),
+
     ('HarperCollins', 'USA');
 GO
 -- lägg till mer data
@@ -269,17 +274,24 @@ insert into Förlag
     (FörlagsNamn, Land)
 values
     ('Houghton Mifflin', 'USA'),
+
     ('Doubleday', 'USA');
 
 insert into  Författare
     (FörNamn, EfterNamn, Födelsedatum)
 values
     ('Martin', 'Kleppmann', '1987-01-01'),
+
     ('Cay', 'Horstmann', '1959-01-01'),
+
     ('Gary', 'Cornell', '1956-01-01'),
+
     ('J.K.', 'Rowling', '1965-07-31'),
+
     ('George', 'Orwell', '1903-06-25'),
+
     ('Astrid', 'Lindgren', '1907-11-14'),
+
     ('Agatha', 'Christie', '1890-09-15');
 GO
 --- lägg till mer författare
@@ -395,45 +407,36 @@ set  FörlagID = 7
 where ISBN13 = '9780261102385';
 GO
 
+-- Koppla böcker och författare
+
 insert into  BokFörfattare
     (FörfattareID, ISBN13)
 values
-    -- Martin Kleppmann
     (1, '9781491903063'),
 
-    -- Core Java (TVÅ författare)
     (2, '9780134694726'),
     (3, '9780134694726'),
 
-    -- J.K Rowling
     (4, '9780747532743'),
     (4, '9780747538486'),
 
-    -- George Orwell
     (5, '9780451524935'),
     (5, '9780451526342'),
 
-    -- Astrid Lindgren
     (6, '9789129698313'),
 
-    -- Agatha Christie
     (7, '9780007119318');
 GO
 
--- Koppla böcker och författare
 insert into BokFörfattare
     (FörfattareID, ISBN13)
 values
-    -- Tolkien
     (8, '9780261102385'),
 
-    -- Harper Lee
     (9, '9780061120084'),
 
-    -- Dan Brown
     (10, '9780307474278'),
 
-    -- Stephen Hawking
     (11, '9780553380163');
 GO
 
@@ -447,24 +450,20 @@ values
     ('Deckare');
 GO
 
+--- lägg data till BokKategori
 
 insert into  BokKategori
     (ISBN13, KategoriID)
 values
 
-    -- Harry Potter
     ('9780747532743', 1),
 
-    -- Core Java
     ('9780134694726', 2),
 
-    -- 1984
     ('9780451524935', 3),
 
-    -- Pippi
     ('9789129698313', 4),
 
-    -- Murder on the Orient Express
     ('9780007119318', 5);
 GO
 
@@ -474,37 +473,29 @@ insert into BokKategori
     (ISBN13, KategoriID)
 values
 
-    -- The Hobbit = Fantasy
     ('9780261102385', 1),
 
-    -- To Kill a Mockingbird = Roman
     ('9780061120084', 3),
 
-    -- The Da Vinci Code = Deckare + Roman
     ('9780307474278', 5),
     ('9780307474278', 3),
 
-    -- A Brief History of Time = Teknologi 
     ('9780553380163', 2);
 
 insert into BokKategori
     (ISBN13, KategoriID)
 values
-    -- Harry Potter = Fantasy + Roman
+
     ('9780747532743', 1),
     ('9780747532743', 3),
 
-    -- Core Java = Teknologi
     ('9780134694726', 2),
 
-    -- 1984 = Roman
     ('9780451524935', 3),
 
-    -- Pippi = Barnbok + Roman
     ('9789129698313', 4),
     ('9789129698313', 3),
 
-    -- Murder on the Orient Express = Deckare + Roman
     ('9780007119318', 5),
     ('9780007119318', 3);
 GO
@@ -541,30 +532,41 @@ GO
 insert into LagerSaldo
     (ButikID, ISBN13, Antal)
 values
-    -- Adlibris
+
     (1, '9780747532743', 12),
     (1, '9780747538486', 8),
     (1, '9780134694726', 4),
 
-    -- Akademibokhandeln 
     (2, '9780451524935', 9),
     (2, '9780451526342', 7),
     (2, '9780747532743', 10),
 
-    -- Bokus 
     (3, '9781491903063', 5),
     (3, '9789129698313', 6),
 
-    -- Pocket Shop
     (4, '9780007119318', 4),
     (4, '9780451524935', 3),
 
-    -- The English Bookshop 
     (5, '9780134694726', 3),
     (5, '9781491903063', 2),
     (5, '9780747532743', 5);
 
   GO
+
+--- lägg till mer data till LagerSaldo
+insert into LagerSaldo
+    (ButikID, ISBN13, Antal)
+values
+
+    (1, '9780061120084', 3),
+    (1, '9780553380163', 0),
+
+    (2, '9780261102385', 0),
+
+    (3, '9780307474278', 5);
+
+      
+GO
 
 insert into Kunder
     (FörNamn, EfterNamn , Email ,Telefonnummer)
@@ -619,43 +621,19 @@ GO
 insert into  OrderDetaljer
     (OrderID, ISBN13, Antal, Pris)
 values
-    -- Order 1(Nour)
+
     (1, '9780747532743', 1, 199.90),
     (1, '9780134694726', 1, 599.90),
 
-    -- Order 2 (Sara)
     (2, '9780451524935', 2, 149.90),
 
-    -- Order 3 (Erik)
     (3, '9781491903063', 1, 499.90),
     (3, '9780134694726', 1, 599.90),
 
-    -- Order 4 (Maja)
     (4, '9780007119318', 1, 179.90),
 
-    -- Order 5 (Ali)
     (5, '9780747538486', 1, 219.90),
     (5, '9780451526342', 1, 129.90),
 
-    -- Order 6 (Emma)
     (6, '9789129698313', 2, 139.90);
 
-
-
-
-
-
-
-
--- ====================================
--- VIEWS
--- ====================================
-
-CREATE VIEW ...
-
-
--- ====================================
--- STORED PROCEDURES
--- ====================================
-
-CREATE PROCEDURE ...
