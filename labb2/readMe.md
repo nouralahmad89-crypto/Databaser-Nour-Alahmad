@@ -74,7 +74,7 @@ Dessa relationer implementeras med hjälp av junction tables.
 
 ## ER-Diagram
 
-![ER Diagram](er_diagram.png)
+![ER Diagram](ER_diagram.png)
 
 ---
 
